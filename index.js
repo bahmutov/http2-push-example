@@ -1,4 +1,3 @@
-// const spdy = require('spdy')
 const express = require('express')
 const fs = require('mz/fs')
 const morgan = require('morgan')
@@ -10,8 +9,8 @@ app.use(express.static('public'))
 function readFiles () {
   const files = [
     'public/index.html',
-    'public/images/banner1.jpg',
-    'public/images/hoare.jpg'
+    'public/images/image1.jpg',
+    'public/images/image2.jpg'
   ]
   return files.map(name => fs.readFile(name))
 }
@@ -33,8 +32,10 @@ function serveHome (req, res) {
   const homePageWithPush = files => {
     if (res.push) {
       console.log('browser supports HTTP/2 Push!!!')
-      pushFile('/images/banner1.jpg', files[1], imageOptions, res)
-      pushFile('/images/hoare.jpg', files[2], imageOptions, res)
+      pushFile('/images/image1.jpg', files[1], imageOptions, res)
+      pushFile('/images/image2.jpg', files[2], imageOptions, res)
+    } else {
+      console.log('No HTTP/2 Push :(, is page secure?', req.secure)
     }
 
     // index.html is the first file
@@ -50,10 +51,7 @@ function serveHome (req, res) {
 
 app.get('/home', serveHome)
 
-spdy.createServer({
-  key: fs.readFileSync('./server.key'),
-  cert: fs.readFileSync('./server.crt')
-}, app).listen(8010, err => {
+app.listen(8010, err => {
   if (err) {
     throw new Error(err)
   }
