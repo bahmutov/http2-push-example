@@ -3,7 +3,11 @@ const fs = require('mz/fs')
 const morgan = require('morgan')
 
 const app = express()
+app.use('/_logger', require('inline-log')({limit: 100}))
 app.use(morgan('dev'))
+
+app.get('/', serveHome)
+
 app.use(express.static('public'))
 
 function readFiles () {
@@ -48,8 +52,6 @@ function serveHome (req, res) {
     .then(homePageWithPush)
     .catch(error => res.status(500).send(error.toString()))
 }
-
-app.get('/home', serveHome)
 
 app.listen(8010, err => {
   if (err) {
