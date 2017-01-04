@@ -1,0 +1,18 @@
+{
+  "name": "http2-push-example",
+  "version": "1.0.0",
+  "description": "Example server showing HTTP/2 Push for Zeit deploy",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "Gleb Bahmutov",
+  "license": "MIT",
+  "dependencies": {
+    "express": "4.14.0",
+    "morgan": "1.7.0",
+    "mz": "2.6.0"
+  }
+}
