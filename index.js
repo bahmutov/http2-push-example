@@ -1,3 +1,4 @@
+const spdy = require('spdy')
 const express = require('express')
 const fs = require('mz/fs')
 const morgan = require('morgan')
@@ -53,7 +54,10 @@ function serveHome (req, res) {
     .catch(error => res.status(500).send(error.toString()))
 }
 
-app.listen(8010, err => {
+spdy.createServer({
+  key: fs.readFileSync('./server.key'),
+  cert: fs.readFileSync('./server.crt')
+}, app).listen(8010, err => {
   if (err) {
     throw new Error(err)
   }
