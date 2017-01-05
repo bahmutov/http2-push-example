@@ -36,11 +36,13 @@ function serveHome (req, res) {
 
   const homePageWithPush = files => {
     if (res.push) {
-      console.log('browser supports HTTP/2 Push!!!')
+      console.log('browser supports HTTP/2 Push!!!',
+        'is SPDY?', req.isSpdy, 'spdy version', req.spdyVersion)
       pushFile('/images/image1.jpg', files[1], imageOptions, res)
       pushFile('/images/image2.jpg', files[2], imageOptions, res)
     } else {
-      console.log('No HTTP/2 Push :(, is page secure?', req.secure)
+      console.log('No HTTP/2 Push :(, is page secure?',
+        req.secure, 'is SPDY?', req.isSpdy)
     }
 
     // index.html is the first file
@@ -54,10 +56,24 @@ function serveHome (req, res) {
     .catch(error => res.status(500).send(error.toString()))
 }
 
-spdy.createServer({
+const tlsOptions = {
   key: fs.readFileSync('./server.key'),
-  cert: fs.readFileSync('./server.crt')
-}, app).listen(8010, err => {
+  cert: fs.readFileSync('./server.crt'),
+  spdy: {
+    plain: false,
+    ssl: true
+  }
+}
+const plainOptions = {
+  spdy: {
+    plain: true,
+    ssl: false,
+    protocolos: ['h2','spdy/3.1', 'spdy/3', 'spdy/2','http/1.1', 'http/1.0'],
+    protocol: 'h2'
+  }
+}
+
+spdy.createServer(tlsOptions, app).listen(8010, err => {
   if (err) {
     throw new Error(err)
   }
