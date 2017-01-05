@@ -1,7 +1,9 @@
-const spdy = require('spdy')
+const http2 = require('http2')
 const express = require('express')
 const fs = require('mz/fs')
 const morgan = require('morgan')
+const path = require('path')
+const bunyan = require('bunyan')
 
 const app = express()
 app.use('/_logger', require('inline-log')({limit: 100}))
@@ -36,13 +38,11 @@ function serveHome (req, res) {
 
   const homePageWithPush = files => {
     if (res.push) {
-      console.log('browser supports HTTP/2 Push!!!',
-        'is SPDY?', req.isSpdy, 'spdy version', req.spdyVersion)
+      console.log('browser supports HTTP/2 Push!!!')
       pushFile('/images/image1.jpg', files[1], imageOptions, res)
       pushFile('/images/image2.jpg', files[2], imageOptions, res)
     } else {
-      console.log('No HTTP/2 Push :(, is page secure?',
-        req.secure, 'is SPDY?', req.isSpdy)
+      console.log('No HTTP/2 Push :(, is page secure?', req.secure)
     }
 
     // index.html is the first file
@@ -56,24 +56,24 @@ function serveHome (req, res) {
     .catch(error => res.status(500).send(error.toString()))
 }
 
-const tlsOptions = {
-  key: fs.readFileSync('./server.key'),
-  cert: fs.readFileSync('./server.crt'),
-  spdy: {
-    plain: false,
-    ssl: true
-  }
-}
-const plainOptions = {
-  spdy: {
-    plain: true,
-    ssl: false
-  }
+function onRequest(req, res) {
+  var filename = path.join(__dirname, req.url)
+  console.log('url', req.url)
+  res.writeHead(404)
+  res.end()
 }
 
-spdy.createServer(plainOptions, app).listen(8010, err => {
+const options = {
+  plain: true,
+  log: bunyan.createLogger({name: 'server'}),
+  key: fs.readFileSync(path.join(__dirname, '/server.key')),
+  cert: fs.readFileSync(path.join(__dirname, '/server.crt'))
+}
+const server = http2.createServer(options, onRequest)
+const port = 8080
+server.listen(port, err => {
   if (err) {
     throw new Error(err)
   }
-  console.log('listening on port 8010')
+  console.log('listening on port', port)
 })
