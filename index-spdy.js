@@ -1,9 +1,7 @@
-const http2 = require('http2')
+const spdy = require('spdy')
 const express = require('express')
 const fs = require('mz/fs')
 const morgan = require('morgan')
-const path = require('path')
-const bunyan = require('bunyan')
 
 const app = express()
 app.use('/_logger', require('inline-log')({limit: 100}))
@@ -56,24 +54,12 @@ function serveHome (req, res) {
     .catch(error => res.status(500).send(error.toString()))
 }
 
-function onRequest(req, res) {
-  var filename = path.join(__dirname, req.url)
-  console.log('url', req.url)
-  res.writeHead(404)
-  res.end()
-}
-
-const options = {
-  plain: true,
-  log: bunyan.createLogger({name: 'server'}),
-  key: fs.readFileSync(path.join(__dirname, '/server.key')),
-  cert: fs.readFileSync(path.join(__dirname, '/server.crt'))
-}
-const server = http2.createServer(options, onRequest)
-const port = 8080
-server.listen(port, err => {
+spdy.createServer({
+  key: fs.readFileSync('./server.key'),
+  cert: fs.readFileSync('./server.crt')
+}, app).listen(8010, err => {
   if (err) {
     throw new Error(err)
   }
-  console.log('listening on port', port)
+  console.log('listening on port 8010')
 })
