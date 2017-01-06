@@ -1,14 +1,12 @@
-const spdy = require('spdy')
+const server = require('spdy')
 const express = require('express')
 const fs = require('mz/fs')
 const morgan = require('morgan')
 
 const app = express()
-app.use('/_logger', require('inline-log')({limit: 100}))
 app.use(morgan('dev'))
 
 app.get('/', serveHome)
-
 app.use(express.static('public'))
 
 function readFiles () {
@@ -44,18 +42,15 @@ function serveHome (req, res) {
       console.log('No HTTP/2 Push :(, is page secure?',
         req.secure, 'is SPDY?', req.isSpdy)
     }
-
-    // index.html is the first file
+    // index.html is the first in the "files" list
     res.writeHead(200)
     res.end(files[0])
   }
-
   // we could also read all files at startup
   Promise.all(readFiles())
     .then(homePageWithPush)
     .catch(error => res.status(500).send(error.toString()))
 }
-
 const tlsOptions = {
   key: fs.readFileSync('./server.key'),
   cert: fs.readFileSync('./server.crt'),
@@ -64,15 +59,8 @@ const tlsOptions = {
     ssl: true
   }
 }
-const plainOptions = {
-  spdy: {
-    plain: true,
-    ssl: false
-  }
-}
-
 const port = process.env.PORT || 5000
-spdy.createServer(plainOptions, app).listen(port, err => {
+server.createServer(tlsOptions, app).listen(port, err => {
   if (err) {
     throw new Error(err)
   }
