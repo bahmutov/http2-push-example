@@ -1,14 +1,11 @@
-const spdy = require('spdy')
+const server = require('spdy')
 const express = require('express')
 const fs = require('mz/fs')
 const morgan = require('morgan')
 
 const app = express()
-app.use('/_logger', require('inline-log')({limit: 100}))
 app.use(morgan('dev'))
-
 app.get('/', serveHome)
-
 app.use(express.static('public'))
 
 function readFiles () {
@@ -64,15 +61,8 @@ const tlsOptions = {
     ssl: true
   }
 }
-const plainOptions = {
-  spdy: {
-    plain: true,
-    ssl: false
-  }
-}
-
 const port = process.env.PORT || 5000
-spdy.createServer(plainOptions, app).listen(port, err => {
+server.createServer(tlsOptions, app).listen(port, err => {
   if (err) {
     throw new Error(err)
   }
