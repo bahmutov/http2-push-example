@@ -71,9 +71,10 @@ const plainOptions = {
   }
 }
 
-spdy.createServer(plainOptions, app).listen(8010, err => {
+const port = process.env.PORT || 5000
+spdy.createServer(plainOptions, app).listen(port, err => {
   if (err) {
     throw new Error(err)
   }
-  console.log('listening on port 8010')
+  console.log('listening on port', port)
 })
