@@ -31,7 +31,7 @@ function serveHome (index, image1, image2) {
   return function (req, res) {
     console.log('serving home')
 
-    if (res.push) {
+    if (res.push && !process.env.PUSH_DISABLED) {
       console.log('browser supports HTTP/2 Push!!!',
         'is SPDY?', req.isSpdy, 'spdy version', req.spdyVersion)
       pushFile('/images/image1.jpg', image1, imageOptions, res)
