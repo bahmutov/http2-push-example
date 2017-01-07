@@ -32,7 +32,7 @@ function serveHome (req, res) {
   console.log('serving home')
 
   const homePageWithPush = files => {
-    if (res.push) {
+    if (false && res.push) {
       console.log('browser supports HTTP/2 Push!!!',
         'is SPDY?', req.isSpdy, 'spdy version', req.spdyVersion)
       pushFile('/images/image1.jpg', files[1], imageOptions, res)
