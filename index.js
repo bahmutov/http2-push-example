@@ -54,11 +54,9 @@ function serveHome (req, res) {
 }
 
 const tlsOptions = {
-  key: fs.readFileSync('./server.key'),
-  cert: fs.readFileSync('./server.crt'),
   spdy: {
-    plain: false,
-    ssl: true
+    plain: true,
+    ssl: false
   }
 }
 const port = process.env.PORT || 5000
