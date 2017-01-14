@@ -22,8 +22,14 @@ function pushFile (path, contents, options, res) {
 }
 
 const imageOptions = {
-  req: {accept: 'image/*'},
-  res: {'content-type': 'image/jpeg'}
+  request: {
+    accept: 'image/*'
+  },
+  response: {
+    'content-type': 'image/jpeg',
+    'cache-control': 'public, max-age=99999',
+    'last-modified': (new Date()).toString()
+  }
 }
 
 function serveHome (index, image1, image2) {
